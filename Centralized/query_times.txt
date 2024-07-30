@@ -1,0 +1,11 @@
+Table,Time (ms)
+sensor1,3421
+sensor2,3388
+sensor3,3406
+sensor4,3392
+sensor5,3385
+hypertable_sensor1,1152
+hypertable_sensor2,1169
+hypertable_sensor3,1157
+hypertable_sensor4,1129
+hypertable_sensor5,1147

@@ -1,0 +1,32 @@
+version: '2'
+
+networks:
+  test:
+
+services:
+  mysql0:
+    container_name: mysql0
+    image: mysql:5.7
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootpassword0
+      - MYSQL_DATABASE=mydatabase0
+      - MYSQL_USER=myuser0
+      - MYSQL_PASSWORD=mypassword0
+    ports:
+      - "3306:3306"
+    networks:
+      - test
+
+  mysql1:
+    container_name: mysql1
+    image: mysql:5.7
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootpassword1
+      - MYSQL_DATABASE=mydatabase1
+      - MYSQL_USER=myuser1
+      - MYSQL_PASSWORD=mypassword1
+    ports:
+      - "3307:3306"
+    networks:
+      - test
+

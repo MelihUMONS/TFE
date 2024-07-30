@@ -1,0 +1,25 @@
+version: '2'
+
+services:
+  db:
+    image: postgres:11
+    volumes:
+      - ./db:/var/lib/postgresql/data
+    ports:
+      - "15432:5432"
+    environment:
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_DB=masters
+
+  timescale-pg-11:
+    image: timescale/timescaledb:latest-pg11
+    container_name: timescale-pg-11
+    ports:
+      - "127.0.0.1:5112:5432"
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: masters
+    volumes:
+      - $HOME/docker/volumes/timescale-pg-11/var/lib/postgresql/data:/var/lib/postgresql/data
+    restart: always
+

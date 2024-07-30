@@ -1,0 +1,306 @@
+DROP TABLE
+NOTICE:  table "sensor3" does not exist, skipping
+DROP TABLE
+NOTICE:  table "sensor4" does not exist, skipping
+DROP TABLE
+NOTICE:  table "sensor5" does not exist, skipping
+DROP TABLE
+Suppression de 5 tables terminée.
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/Centralized$ ./create
+bash: ./create: No such file or directory
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/Centralized$ ./createTables.sh 
+ERROR:  database "test" already exists
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+Création de 5 tables terminée.
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/Centralized$ ./importFile.sh 
+INSERT 0 658698
+Données insérées dans la table sensor1.
+INSERT 0 658698
+Données insérées dans la table sensor2.
+INSERT 0 658698
+Données insérées dans la table sensor3.
+INSERT 0 658698
+Données insérées dans la table sensor4.
+INSERT 0 658698
+Données insérées dans la table sensor5.
+Insertion des données terminée.
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/Centralized$ chmod +x query.sh 
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/Centralized$ ./query.sh 
+CREATE TABLE
+        create_hypertable        
+---------------------------------
+ (1,public,hypertable_sensor1,t)
+(1 row)
+
+INSERT 0 658698
+CREATE TABLE
+        create_hypertable        
+---------------------------------
+ (2,public,hypertable_sensor2,t)
+(1 row)
+
+INSERT 0 658698
+CREATE TABLE
+        create_hypertable        
+---------------------------------
+ (3,public,hypertable_sensor3,t)
+(1 row)
+
+INSERT 0 658698
+CREATE TABLE
+        create_hypertable        
+---------------------------------
+ (4,public,hypertable_sensor4,t)
+(1 row)
+
+INSERT 0 658698
+CREATE TABLE
+        create_hypertable        
+---------------------------------
+ (5,public,hypertable_sensor5,t)
+(1 row)
+
+INSERT 0 658698
+Temps pour la table sensor1 (normale) : 878 ms
+Temps pour la table sensor2 (normale) : 841 ms
+Temps pour la table sensor3 (normale) : 842 ms
+Temps pour la table sensor4 (normale) : 850 ms
+Temps pour la table sensor5 (normale) : 938 ms
+Temps pour la table hypertable_sensor1 (hypertable) : 931 ms
+Temps pour la table hypertable_sensor2 (hypertable) : 951 ms
+Temps pour la table hypertable_sensor3 (hypertable) : 969 ms
+Temps pour la table hypertable_sensor4 (hypertable) : 885 ms
+Temps pour la table hypertable_sensor5 (hypertable) : 879 ms
+Les temps de requête ont été enregistrés dans query_times.txt.
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/Centralized$ ^C
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/Centralized$ ./deleteTables.sh 
+DROP TABLE
+DROP TABLE
+DROP TABLE
+DROP TABLE
+DROP TABLE
+Suppression de 5 tables terminée.
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/Centralized$ ./createTables.sh 
+ERROR:  database "test" already exists
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+Création de 5 tables terminée.
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/Centralized$ ./importFile.sh 
+INSERT 0 658698
+Données insérées dans la table sensor1.
+INSERT 0 658698
+Données insérées dans la table sensor2.
+INSERT 0 658698
+Données insérées dans la table sensor3.
+INSERT 0 658698
+Données insérées dans la table sensor4.
+INSERT 0 658698
+Données insérées dans la table sensor5.
+Insertion des données terminée.
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/Centralized$ #!/bin/bash
+ostgres"
+TABLE_PREFIX="sensor"
+TABLE_COUNT=5
+QUERY_OUTPUT_FILE="query_times.txt"
+
+# Commande pour accéder à PostgreSQL
+PSQL="docker exec -it timescale-pg-11 psql -U $DB_USER -d $DB_NAME -c"
+
+# Fonctioruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/Centralized$ 
+n pour mesurer le temps d'exécution d'une requête
+measure_query_time() {
+  local table_name=$1
+  local query="SELECT COUNT(*) FROM $table_name WHERE time >= '2023-01-01' AND time < '2023-02-01';"
+  local start_time=$(date +%s%N)
+  $PSQL "$query" > /druzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/Centralized$ # Variables
+ev/null
+  local end_time=$(date +%s%N)
+  local elapsed_time=$(( ($end_time - $start_time) / 1000000 )) # Convert to milliseconds
+  echo "$elapsed_time"
+}
+
+# Créer les hypertables
+for i in $(seq 1 $TABLE_COUNT)
+do
+  TABLE_NAME="${TABLE_PREFIX}${i}"
+  ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/Centralized$ DB_NAME="test"
+HYPERTABLE_NAME="hypertable_${TABLE_NAME}"
+  
+  # Créer une copie de la table de capteur
+  $PSQL "CREATE TABLE $HYPERTABLE_NAME (LIKE $TABLE_NAME INCLUDING ALL);"
+  
+  # Convertir la copie en hypertable
+  $PSQL "SELECT create_hypertable('$HYPERTABLE_ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/Centralized$ DB_USER="postgres"
+table de capteur dans l'hypertable
+  $PSQL "INSERT INTO $HYPERTABLE_NAME SELECT * FROM $TABLE_NAME;"
+done
+
+# Initialiser le fichier de sortie
+echo "Table,Time (ms)" > $QUERY_OUTPUT_FILE
+
+# Mesurer le ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/Centralized$ TABLE_PREFIX="sensor"
+n $(seq 1 $TABLE_COUNT)
+do
+  TABLE_NAME="${TABLE_PREFIX}${i}"
+  query_time=$(measure_query_time $TABLE_NAME)
+  echo "$TABLE_NAME,$query_time" >> $QUERY_OUTPUT_FILE
+  echo "Temps pour la table $TABLE_NAME (normale) : $query_time ms"
+done
+
+# Mesurer le temps des requêtes sur les hypertables
+for i in $ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/Centralized$ TABLE_COUNT=5
+ble_${TABLE_PREFIX}${i}"
+  query_time=$(measure_query_time $HYPERTABLE_NAME)
+  echo "$HYPERTABLE_NAME,$query_time" >> $QUERY_OUTPUT_FILE
+  echo "Temps pour la table $HYPERTABLE_NAME (hypertable) : $query_time ms"
+done
+
+echo "Les temps de requête ont ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/Centralized$ QUERY_OUTPUT_FILE="query_times.txt"
+^[[Aruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/Centralized$ 
+^[[Aruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/Centralized$ # Commande pour accéder à PostgreSQL
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/Centralized$ PSQL="docker exec -it timescale-pg-11 psql -U $DB_USER -d $DB_NAME -c"
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/Centralized$ 
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/Centralized$ # Fonction pour mesurer le temps d'exécution d'une requête
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/Centralized$ measure_query_time() {
+>   local table_name=$1
+>   local query="SELECT COUNT(*) FROM $table_name WHERE time >= '2023-01-01' AND time < '2023-02-01';"
+>   local start_time=$(date +%s%N)
+>   $PSQL "$query" > /dev/null
+>   local end_time=$(date +%s%N)
+>   local elapsed_time=$(( ($end_time - $start_time) / 1000000 )) # Convert to milliseconds
+>   echo "$elapsed_time"
+> }
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/Centralized$ 
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/Centralized$ # Créer les hypertables
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/Centralized$ for i in $(seq 1 $TABLE_COUNT)
+> do
+>   TABLE_NAME="${TABLE_PREFIX}${i}"
+>   HYPERTABLE_NAME="hypertable_${TABLE_NAME}"
+>   
+>   # Créer une copie de la table de capteur
+>   $PSQL "CREATE TABLE $HYPERTABLE_NAME (LIKE $TABLE_NAME INCLUDING ALL);"
+>   
+>   # Convertir la copie en hypertable
+>   $PSQL "SELECT create_hypertable('$HYPERTABLE_NAME', 'time');"
+>   
+>   # Insérer les données de la table de capteur dans l'hypertable
+>   $PSQL "INSERT INTO $HYPERTABLE_NAME SELECT * FROM $TABLE_NAME;"
+> done
+
+# Initialiser le fichier de sortie
+echo "Table,Time (ms)" > $QUERY_OUTPUT_FILE
+
+# Mesurer le temps des requêtes sur les tables normales
+for i in $(seq 1 $TABLE_COUNT)
+do
+  TABLE_NAME="${TABLE_PREFIX}${i}"
+  query_time=$(measure_query_time $TABLE_NAME)
+  echo "$TABLE_NAME,$query_time" >> $QUERY_OUTPUT_FILE
+  echo "Temps pour la table $TABLE_NAME (normale) : $query_time ms"
+done
+
+# Mesurer le temps des requêtes sur les hypertables
+for i in $(seq 1 $TABLE_COUNT)
+do
+  HYPERTABLE_NAME="hypertable_${TABLE_PREFIX}${i}"
+  query_time=$(measure_query_time $HYPERTABLE_NAME)
+  echo "$HYPERTABLE_NAME,$query_time" >> $QUERY_OUTPUT_FILE
+  echo "Temps pour la table $HYPERTABLE_NAME (hypertable) : $query_time ms"
+done
+
+echo "Les temps de requête ont été enregistrés dans $QUERY_OUTPUT_FILE."
+^[[A^[[A^[[AERROR:  relation "hypertable_sensor1" already exists
+ERROR:  table "hypertable_sensor1" is already a hypertable
+^C
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/Centralized$ ^C
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/Centralized$ ^C
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/Centralized$ ^C
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/Centralized$ ^C
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/Centralized$ ^C
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/Centralized$ ^C
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/Centralized$ ^C
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/Centralized$ ^C
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/Centralized$ ^C
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/Centralized$ ^C
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/Centralized$ ./query.sh 
+ERROR:  relation "hypertable_sensor1" already exists
+ERROR:  table "hypertable_sensor1" is already a hypertable
+^CCancel request sent
+ERROR:  canceling statement due to user request
+^CCancel request sent
+ERROR:  canceling statement due to user request
+^C
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/Centralized$ ^C
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/Centralized$ ^C
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/Centralized$ ./deleteTables.sh 
+DROP TABLE
+DROP TABLE
+DROP TABLE
+DROP TABLE
+DROP TABLE
+Suppression de 5 tables terminée.
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/Centralized$ ./query.sh 
+CREATE TABLE
+        create_hypertable        
+---------------------------------
+ (6,public,hypertable_sensor1,t)
+(1 row)
+
+INSERT 0 658698
+CREATE INDEX
+CREATE TABLE
+        create_hypertable        
+---------------------------------
+ (7,public,hypertable_sensor2,t)
+(1 row)
+
+INSERT 0 658698
+CREATE INDEX
+CREATE TABLE
+        create_hypertable        
+---------------------------------
+ (8,public,hypertable_sensor3,t)
+(1 row)
+
+INSERT 0 658698
+CREATE INDEX
+CREATE TABLE
+        create_hypertable        
+---------------------------------
+ (9,public,hypertable_sensor4,t)
+(1 row)
+
+INSERT 0 658698
+CREATE INDEX
+CREATE TABLE
+        create_hypertable         
+----------------------------------
+ (10,public,hypertable_sensor5,t)
+(1 row)
+
+INSERT 0 658698
+CREATE INDEX
+CREATE INDEX
+Temps pour la table sensor1 (normale) : 3421 ms
+CREATE INDEX
+Temps pour la table sensor2 (normale) : 3388 ms
+CREATE INDEX
+Temps pour la table sensor3 (normale) : 3406 ms
+CREATE INDEX
+Temps pour la table sensor4 (normale) : 3392 ms
+CREATE INDEX
+Temps pour la table sensor5 (normale) : 3385 ms
+Temps pour la table hypertable_sensor1 (hypertable) : 1152 ms
+Temps pour la table hypertable_sensor2 (hypertable) : 1169 ms
+Temps pour la table hypertable_sensor3 (hypertable) : 1157 ms
+Temps pour la table hypertable_sensor4 (hypertable) : 1129 ms
+Temps pour la table hypertable_sensor5 (hypertable) : 1147 ms
+Les temps de requête ont été enregistrés dans query_times.txt.
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/Centralized$ 

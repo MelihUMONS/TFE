@@ -1,0 +1,491 @@
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/fabric-samples/test-network/docker/docker-compose-pg.yaml$ cd ../
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/.local/share/Trash/files$ cd ~/Documents/TFE/fabric-samples/test-network/docker/
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/fabric-samples/test-network/docker$ docker-compose -f docker-compose-pg.yaml up -d
+ERROR: Version in "./docker-compose-pg.yaml" is unsupported. You might be seeing this error because you're using the wrong Compose file version. Either specify a version of "2" (or "2.0") and place your service definitions under the `services` key, or omit the `version` key and place your service definitions at the root of the file to use version 1.
+For more on the Compose file format versions, see https://docs.docker.com/compose/compose-file/
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/fabric-samples/test-network/docker$ docker-compose -f docker-compose-pg.yaml up -d
+Creating network "docker_default" with the default driver
+Pulling db (postgres:14)...
+14: Pulling from library/postgres
+f11c1adaa26e: Downloading [======>                                            ]  3.845MB/29.13MBwnload complete
+7913417faa7b: Downloading [===========================>                       ]  2.538MB/4.534MBwnloading [==>                                                ]  63.13kB/1.447MBiting
+a9a4a49ce900: Waiting
+16af77186cab: Waiting
+531b0458714f: Waiting
+52add22277de: Waiting
+d7cf32a61ba6: Waiting
+a3b9dd9a7881: Waiting
+65a37a9d747d: Waiting
+fae64833fcf0: Waiting
+25ac48be0dbb: Waiting
+^CERROR: Aborting.
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/fabric-samples/test-network/docker$ sudo apt remove postgresql
+[sudo] Mot de passe de ruzgarkartali : 
+Lecture des listes de paquets... Fait
+Construction de l'arbre des dépendances       
+Lecture des informations d'état... Fait
+Les paquets suivants seront ENLEVÉS :
+  postgresql
+0 mis à jour, 0 nouvellement installés, 1 à enlever et 0 non mis à jour.
+Après cette opération, 59,4 ko d'espace disque seront libérés.
+Souhaitez-vous continuer ? [O/n] o
+(Lecture de la base de données... 226323 fichiers et répertoires déjà installés.)
+Suppression de postgresql (9.5+173ubuntu0.3) ...
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/fabric-samples/test-network/docker$ psql
+psql: FATAL:  role "ruzgarkartali" does not exist
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/fabric-samples/test-network/docker$ sudo apt remove postgresql-contrib
+Lecture des listes de paquets... Fait
+Construction de l'arbre des dépendances       
+Lecture des informations d'état... Fait
+Le paquet « postgresql-contrib » n'est pas installé, et ne peut donc être supprimé
+0 mis à jour, 0 nouvellement installés, 0 à enlever et 0 non mis à jour.
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/fabric-samples/test-network/docker$ sudo apt remove postgresql-client
+Lecture des listes de paquets... Fait
+Construction de l'arbre des dépendances       
+Lecture des informations d'état... Fait
+Le paquet « postgresql-client » n'est pas installé, et ne peut donc être supprimé
+0 mis à jour, 0 nouvellement installés, 0 à enlever et 0 non mis à jour.
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/fabric-samples/test-network/docker$ sudo apt autoremove
+Lecture des listes de paquets... Fait
+Construction de l'arbre des dépendances       
+Lecture des informations d'état... Fait
+0 mis à jour, 0 nouvellement installés, 0 à enlever et 0 non mis à jour.
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/fabric-samples/test-network/docker$ psql
+psql: FATAL:  role "ruzgarkartali" does not exist
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/fabric-samples/test-network/docker$ sudo apt remove --purge postgresql postgresql-client postgresql-common
+ postgresql-contrib
+Lecture des listes de paquets... Fait
+Construction de l'arbre des dépendances       
+Lecture des informations d'état... Fait
+Le paquet « postgresql » n'est pas installé, et ne peut donc être supprimé
+Le paquet « postgresql-client » n'est pas installé, et ne peut donc être supprimé
+Le paquet « postgresql-contrib » n'est pas installé, et ne peut donc être supprimé
+Les paquets suivants seront ENLEVÉS :
+  postgresql-9.5* postgresql-common* postgresql-contrib-9.5*
+0 mis à jour, 0 nouvellement installés, 3 à enlever et 0 non mis à jour.
+Après cette opération, 15,0 Mo d'espace disque seront libérés.
+Souhaitez-vous continuer ? [O/n] o
+(Lecture de la base de données... 226320 fichiers et répertoires déjà installés.)
+Suppression de postgresql-contrib-9.5 (9.5.25-0ubuntu0.16.04.1) ...
+update-alternatives: avertissement: forçage de la réinstallation de l'alternative /usr/share/postgresql/9.5/man/man1/postmaster.1.gz car le groupe de liens postmaster.1.gz est cassé
+Suppression de postgresql-9.5 (9.5.25-0ubuntu0.16.04.1) ...
+Purge des fichiers de configuration de postgresql-9.5 (9.5.25-0ubuntu0.16.04.1) ...
+Dropping cluster main...
+Suppression de postgresql-common (173ubuntu0.3) ...
+Suppression de « détournement de /usr/bin/pg_config en /usr/bin/pg_config.libpq-dev par postgresql-common »
+Purge des fichiers de configuration de postgresql-common (173ubuntu0.3) ...
+dpkg : avertissement : lors de la suppression de postgresql-common, le répertoire « /var/lib/postgresql » n'était pas vide, donc il n'a pas été supprimé
+Traitement des actions différées (« triggers ») pour man-db (2.7.5-1) ...
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/fabric-samples/test-network/docker$ sudo apt autoremove
+Lecture des listes de paquets... Fait
+Construction de l'arbre des dépendances       
+Lecture des informations d'état... Fait
+Les paquets suivants seront ENLEVÉS :
+  libpq5 postgresql-client-9.5 postgresql-client-common
+0 mis à jour, 0 nouvellement installés, 3 à enlever et 0 non mis à jour.
+Après cette opération, 3 646 ko d'espace disque seront libérés.
+Souhaitez-vous continuer ? [O/n] o
+(Lecture de la base de données... 225902 fichiers et répertoires déjà installés.)
+Suppression de postgresql-client-9.5 (9.5.25-0ubuntu0.16.04.1) ...
+Suppression de libpq5:amd64 (9.5.25-0ubuntu0.16.04.1) ...
+Suppression de postgresql-client-common (173ubuntu0.3) ...
+Traitement des actions différées (« triggers ») pour libc-bin (2.23-0ubuntu11.3) ...
+Traitement des actions différées (« triggers ») pour man-db (2.7.5-1) ...
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/fabric-samples/test-network/docker$ psql
+bash: /usr/bin/psql: Aucun fichier ou dossier de ce type
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/fabric-samples/test-network/docker$ docker-compose -f docker-compose-pg.yaml up -d
+Pulling db (postgres:14)...
+14: Pulling from library/postgres
+f11c1adaa26e: Pull complete
+94e98f746db3: Pull complete
+7913417faa7b: Pull complete
+1f3f992808ed: Pull complete
+7b66bc432a11: Pull complete
+a9a4a49ce900: Pull complete
+16af77186cab: Pull complete
+531b0458714f: Pull complete
+52add22277de: Pull complete
+d7cf32a61ba6: Pull complete
+a3b9dd9a7881: Pull complete
+65a37a9d747d: Pull complete
+fae64833fcf0: Pull complete
+25ac48be0dbb: Pull complete
+Digest: sha256:2f7365d1f574dba34f6332978169afe60af9de9608fffbbfecb7d04cc5233698
+Status: Downloaded newer image for postgres:14
+Creating docker_db_1
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/fabric-samples/test-network/docker$ psql
+bash: /usr/bin/psql: Aucun fichier ou dossier de ce type
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/fabric-samples/test-network/docker$ docker ps -a
+CONTAINER ID        IMAGE                                                                                                                                                                   COMMAND                  CREATED             STATUS                     PORTS               NAMES
+bd011aa441e5        postgres:14                                                                                                                                                             "docker-entrypoint.s…"   4 minutes ago       Exited (1) 4 minutes ago                       docker_db_1
+56edec90140a        dev-peer0.org1.example.com-fabcar_3-16a949759369a9742370024b9dc653090909420521b06d873c2a7d8c318a7903-a18267d00998bdb37cd422a32bfeff8d138ae00c7089570a3c9093cca4403035   "docker-entrypoint.s…"   8 days ago          Exited (0) 8 days ago                          dev-peer0.org1.example.com-fabcar_3-16a949759369a9742370024b9dc653090909420521b06d873c2a7d8c318a7903
+8610c3cf6da0        dev-peer0.org2.example.com-fabcar_3-16a949759369a9742370024b9dc653090909420521b06d873c2a7d8c318a7903-2523632e8e06a39e9b46b38af7f1018402632df0ecfce876142d566b62415d7d   "docker-entrypoint.s…"   8 days ago          Exited (0) 8 days ago                          dev-peer0.org2.example.com-fabcar_3-16a949759369a9742370024b9dc653090909420521b06d873c2a7d8c318a7903
+9119b5e78a58        hyperledger/fabric-peer:latest                                                                                                                                          "peer node start"        8 days ago          Exited (0) 8 days ago                          peer0.org2.example.com
+01fde7c0393c        hyperledger/fabric-peer:latest                                                                                                                                          "peer node start"        8 days ago          Exited (0) 8 days ago                          peer0.org1.example.com
+2b5bb21a361c        hyperledger/fabric-orderer:latest                                                                                                                                       "orderer"                8 days ago          Exited (0) 8 days ago                          orderer.example.com
+a4b9608280a5        docker                                                                                                                                                                  "dockerd-entrypoint.…"   2 weeks ago         Exited (1) 2 weeks ago                         vibrant_saha
+ffb9230c78ca        mysql:5.7                                                                                                                                                               "docker-entrypoint.s…"   7 weeks ago         Exited (0) 8 days ago                          mysql1
+ba1c0f8b321b        mysql:5.7                                                                                                                                                               "docker-entrypoint.s…"   7 weeks ago         Exited (0) 8 days ago                          mysql0
+36651cf5d62d        89cd71f28010                                                                                                                                                            "peer node start"        7 weeks ago         Exited (1) 7 weeks ago                         peer0.hospital.network.com
+a81d2f9d247d        b89bce05c7db                                                                                                                                                            "orderer"                7 weeks ago         Exited (2) 7 weeks ago                         orderer2.network.com
+f5a70e2e4efe        b967e8b98b6b                                                                                                                                                            "tini -- /docker-ent…"   7 weeks ago         Exited (143) 7 weeks ago                       couchdb5
+c6c1acf6f86f        b967e8b98b6b                                                                                                                                                            "tini -- /docker-ent…"   7 weeks ago         Exited (143) 7 weeks ago                       couchdb3
+798bb92dd295        b967e8b98b6b                                                                                                                                                            "tini -- /docker-ent…"   7 weeks ago         Exited (143) 7 weeks ago                       couchdb4
+1315085cbcf9        b89bce05c7db                                                                                                                                                            "orderer"                7 weeks ago         Exited (2) 7 weeks ago                         orderer.network.com
+d8df4ea852d5        89cd71f28010                                                                                                                                                            "peer node start"        7 weeks ago         Exited (1) 7 weeks ago                         peer0.generalservices.network.com
+64eda518cf8c        b967e8b98b6b                                                                                                                                                            "tini -- /docker-ent…"   7 weeks ago         Exited (143) 7 weeks ago                       couchdb0
+7895ef5e7742        89cd71f28010                                                                                                                                                            "peer node start"        7 weeks ago         Exited (1) 7 weeks ago                         peer0.cardiology.network.com
+9c87e1505a2b        89cd71f28010                                                                                                                                                            "peer node start"        7 weeks ago         Exited (1) 7 weeks ago                         peer1.generalservices.network.com
+2c7145fdf7ce        89cd71f28010                                                                                                                                                            "peer node start"        7 weeks ago         Exited (1) 7 weeks ago                         peer1.cardiology.network.com
+cfd2374bc63f        b967e8b98b6b                                                                                                                                                            "tini -- /docker-ent…"   7 weeks ago         Exited (143) 7 weeks ago                       couchdb1
+851ed73df956        89cd71f28010                                                                                                                                                            "peer node start"        7 weeks ago         Exited (1) 7 weeks ago                         peer1.hospital.network.com
+0b39a009aa73        b89bce05c7db                                                                                                                                                            "orderer"                7 weeks ago         Exited (2) 7 weeks ago                         orderer3.network.com
+83b6b781869e        b967e8b98b6b                                                                                                                                                            "tini -- /docker-ent…"   7 weeks ago         Exited (143) 7 weeks ago                       couchdb2
+0c432484772f        c2449e2873d5                                                                                                                                                            "sh -c 'fabric-ca-se…"   7 weeks ago         Exited (137) 7 weeks ago                       ca.generalservices.network.com
+cecd405df51a        c2449e2873d5                                                                                                                                                            "sh -c 'fabric-ca-se…"   7 weeks ago         Exited (137) 7 weeks ago                       ca_orderer
+45a71b2de2aa        c2449e2873d5                                                                                                                                                            "sh -c 'fabric-ca-se…"   7 weeks ago         Exited (137) 7 weeks ago                       ca.hospital.network.com
+2353880b423b        c2449e2873d5                                                                                                                                                            "sh -c 'fabric-cruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/fabric-samples/test-network/docker$ docker exec -it docker_db_1  psql -U 
+Error response from daemon: Container bd011aa441e5e4a511146eb723e667b36f4494b0d5ddd64ed75545b066b84536 is not running
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/fabric-samples/test-network/docker$ docker-compose -f docker-compose-pg.yaml up -d
+Starting docker_db_1
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/fabric-samples/test-network/docker$ docker exec -it docker_db_1  psql -U 
+Error response from daemon: Container bd011aa441e5e4a511146eb723e667b36f4494b0d5ddd64ed75545b066b84536 is not running
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/fabric-samples/test-network/docker$ docker ps 
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/fabric-samples/test-network/docker$ docker ps
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/fabric-samples/test-network/docker$ docker ps -a
+CONTAINER ID        IMAGE                                                                                                                                                                   COMMAND                  CREATED             STATUS                      PORTS               NAMES
+bd011aa441e5        postgres:14                                                                                                                                                             "docker-entrypoint.s…"   5 minutes ago       Exited (1) 20 seconds ago                       docker_db_1
+56edec90140a        dev-peer0.org1.example.com-fabcar_3-16a949759369a9742370024b9dc653090909420521b06d873c2a7d8c318a7903-a18267d00998bdb37cd422a32bfeff8d138ae00c7089570a3c9093cca4403035   "docker-entrypoint.s…"   8 days ago          Exited (0) 8 days ago                           dev-peer0.org1.example.com-fabcar_3-16a949759369a9742370024b9dc653090909420521b06d873c2a7d8c318a7903
+8610c3cf6da0        dev-peer0.org2.example.com-fabcar_3-16a949759369a9742370024b9dc653090909420521b06d873c2a7d8c318a7903-2523632e8e06a39e9b46b38af7f1018402632df0ecfce876142d566b62415d7d   "docker-entrypoint.s…"   8 days ago          Exited (0) 8 days ago                           dev-peer0.org2.example.com-fabcar_3-16a949759369a9742370024b9dc653090909420521b06d873c2a7d8c318a7903
+9119b5e78a58        hyperledger/fabric-peer:latest                                                                                                                                          "peer node start"        8 days ago          Exited (0) 8 days ago                           peer0.org2.example.com
+01fde7c0393c        hyperledger/fabric-peer:latest                                                                                                                                          "peer node start"        8 days ago          Exited (0) 8 days ago                           peer0.org1.example.com
+2b5bb21a361c        hyperledger/fabric-orderer:latest                                                                                                                                       "orderer"                8 days ago          Exited (0) 8 days ago                           orderer.example.com
+a4b9608280a5        docker                                                                                                                                                                  "dockerd-entrypoint.…"   2 weeks ago         Exited (1) 2 weeks ago                          vibrant_saha
+ffb9230c78ca        mysql:5.7                                                                                                                                                               "docker-entrypoint.s…"   7 weeks ago         Exited (0) 8 days ago                           mysql1
+ba1c0f8b321b        mysql:5.7                                                                                                                                                               "docker-entrypoint.s…"   7 weeks ago         Exited (0) 8 days ago                           mysql0
+36651cf5d62d        89cd71f28010                                                                                                                                                            "peer node start"        7 weeks ago         Exited (1) 7 weeks ago                          peer0.hospital.network.com
+a81d2f9d247d        b89bce05c7db                                                                                                                                                            "orderer"                7 weeks ago         Exited (2) 7 weeks ago                          orderer2.network.com
+f5a70e2e4efe        b967e8b98b6b                                                                                                                                                            "tini -- /docker-ent…"   7 weeks ago         Exited (143) 7 weeks ago                        couchdb5
+c6c1acf6f86f        b967e8b98b6b                                                                                                                                                            "tini -- /docker-ent…"   7 weeks ago         Exited (143) 7 weeks ago                        couchdb3
+798bb92dd295        b967e8b98b6b                                                                                                                                                            "tini -- /docker-ent…"   7 weeks ago         Exited (143) 7 weeks ago                        couchdb4
+1315085cbcf9        b89bce05c7db                                                                                                                                                            "orderer"                7 weeks ago         Exited (2) 7 weeks ago                          orderer.network.com
+d8df4ea852d5        89cd71f28010                                                                                                                                                            "peer node start"        7 weeks ago         Exited (1) 7 weeks ago                          peer0.generalservices.network.com
+64eda518cf8c        b967e8b98b6b                                                                                                                                                            "tini -- /docker-ent…"   7 weeks ago         Exited (143) 7 weeks ago                        couchdb0
+7895ef5e7742        89cd71f28010                                                                                                                                                            "peer node start"        7 weeks ago         Exited (1) 7 weeks ago                          peer0.cardiology.network.com
+9c87e1505a2b        89cd71f28010                                                                                                                                                            "peer node start"        7 weeks ago         Exited (1) 7 weeks ago                          peer1.generalservices.network.com
+2c7145fdf7ce        89cd71f28010                                                                                                                                                            "peer node start"        7 weeks ago         Exited (1) 7 weeks ago                          peer1.cardiology.network.com
+cfd2374bc63f        b967e8b98b6b                                                                                                                                                            "tini -- /docker-ent…"   7 weeks ago         Exited (143) 7 weeks ago                        couchdb1
+851ed73df956        89cd71f28010                                                                                                                                                            "peer node start"        7 weeks ago         Exited (1) 7 weeks ago                          peer1.hospital.network.com
+0b39a009aa73        b89bce05c7db                                                                                                                                                            "orderer"                7 weeks ago         Exited (2) 7 weeks ago                          orderer3.network.com
+83b6b781869e        b967e8b98b6b                                                                                                                                                            "tini -- /docker-ent…"   7 weeks ago         Exited (143) 7 weeks ago                        couchdb2
+0c432484772f        c2449e2873d5                                                                                                                                                            "sh -c 'fabric-ca-se…"   7 weeks ago         Exited (137) 7 weeks ago                        ca.generalservices.network.com
+cecd405df51a        c2449e2873d5                                                                                                                                                            "sh -c 'fabric-ca-se…"   7 weeks ago         Exited (137) 7 weeks ago                        ca_orderer
+45a71b2de2aa        c2449e2873d5                                                                                                                                                            "sh -c 'fabric-ca-se…"   7 weeks ago         Exited (137) 7 weeks ago                        ca.hospital.network.com
+2353880b423b        c2449e2873d5                                                                                                                                                            "sh -c 'fabric-ca-se…"   7 weeks ago         Exited (137) 7 weeks ago                        ca.cardiology.network.com
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/fabric-samples/test-network/docker$ docker-compose -f docker-compose-pg.yaml up
+ERROR: yaml.scanner.ScannerError: while scanning for the next token
+found character '\t' that cannot start any token
+  in "./docker-compose-pg.yaml", line 5, column 1
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/fabric-samples/test-network/docker$ docker-compose -f docker-compose-pg.yaml up -d
+ERROR: yaml.scanner.ScannerError: while scanning for the next token
+found character '\t' that cannot start any token
+  in "./docker-compose-pg.yaml", line 5, column 1
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/fabric-samples/test-network/docker$ docker-compose -f docker-compose-pg.yaml up
+Starting docker_db_1
+Attaching to docker_db_1
+db_1  | popen failure: Cannot allocate memory
+db_1  | initdb: error: The program "postgres" is needed by initdb but was not found in the
+db_1  | same directory as "/usr/lib/postgresql/14/bin/initdb".
+db_1  | Check your installation.
+docker_db_1 exited with code 1
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/fabric-samples/test-network/docker$ ^C
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/fabric-samples/test-network/docker$ docker-compose -f docker-compose-pg.yaml up -d
+Starting docker_db_1
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/fabric-samples/test-network/docker$ docker ps
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/fabric-samples/test-network/docker$ docker-compose down
+ERROR: 
+        Can't find a suitable configuration file in this directory or any
+        parent. Are you in the right directory?
+
+        Supported filenames: docker-compose.yml, docker-compose.yaml
+        
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/fabric-samples/test-network/docker$ docker-compose -f docker-compose-pg.yaml down
+Removing docker_db_1 ... done
+Removing network docker_default
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/fabric-samples/test-network/docker$ rm -rf ./db
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/fabric-samples/test-network/docker$ 
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/fabric-samples/test-network/docker$ mkdir ./db
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/fabric-samples/test-network/docker$ 
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/fabric-samples/test-network/docker$ docker-compose -f docker-compose-pg.yaml up
+Creating network "docker_default" with the default driver
+Creating docker_db_1
+Attaching to docker_db_1
+db_1  | popen failure: Cannot allocate memory
+db_1  | initdb: error: The program "postgres" is needed by initdb but was not found in the
+db_1  | same directory as "/usr/lib/postgresql/14/bin/initdb".
+db_1  | Check your installation.
+docker_db_1 exited with code 1
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/fabric-samples/test-network/docker$ docker-compose -f docker-compose-pg.yaml up
+ERROR: The Compose file './docker-compose-pg.yaml' is invalid because:
+Unsupported config option for services: 'adminer'
+Unsupported config option for volumes: 'pgdata'
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/fabric-samples/test-network/docker$ docker-compose -f docker-compose-pg.yaml up
+ERROR: The Compose file './docker-compose-pg.yaml' is invalid because:
+Unsupported config option for services: 'postgres'
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/fabric-samples/test-network/docker$ docker-compose -f docker-compose-pg.yaml up
+ERROR: The Compose file './docker-compose-pg.yaml' is invalid because:
+Unsupported config option for services: 'postgres'
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/fabric-samples/test-network/docker$ docker-compose -f docker-compose-pg.yaml down
+ERROR: The Compose file './docker-compose-pg.yaml' is invalid because:
+Unsupported config option for services: 'postgres'
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/fabric-samples/test-network/docker$ docker ps
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/fabric-samples/test-network/docker$ docker ps -a
+CONTAINER ID        IMAGE                                                                                                                                                                   COMMAND                  CREATED             STATUS                      PORTS               NAMES
+29eac62bf5cc        postgres:14                                                                                                                                                             "docker-entrypoint.s…"   16 minutes ago      Exited (1) 16 minutes ago                       docker_db_1
+56edec90140a        dev-peer0.org1.example.com-fabcar_3-16a949759369a9742370024b9dc653090909420521b06d873c2a7d8c318a7903-a18267d00998bdb37cd422a32bfeff8d138ae00c7089570a3c9093cca4403035   "docker-entrypoint.s…"   8 days ago          Exited (0) 8 days ago                           dev-peer0.org1.example.com-fabcar_3-16a949759369a9742370024b9dc653090909420521b06d873c2a7d8c318a7903
+8610c3cf6da0        dev-peer0.org2.example.com-fabcar_3-16a949759369a9742370024b9dc653090909420521b06d873c2a7d8c318a7903-2523632e8e06a39e9b46b38af7f1018402632df0ecfce876142d566b62415d7d   "docker-entrypoint.s…"   8 days ago          Exited (0) 8 days ago                           dev-peer0.org2.example.com-fabcar_3-16a949759369a9742370024b9dc653090909420521b06d873c2a7d8c318a7903
+9119b5e78a58        hyperledger/fabric-peer:latest                                                                                                                                          "peer node start"        8 days ago          Exited (0) 8 days ago                           peer0.org2.example.com
+01fde7c0393c        hyperledger/fabric-peer:latest                                                                                                                                          "peer node start"        8 days ago          Exited (0) 8 days ago                           peer0.org1.example.com
+2b5bb21a361c        hyperledger/fabric-orderer:latest                                                                                                                                       "orderer"                8 days ago          Exited (0) 8 days ago                           orderer.example.com
+a4b9608280a5        docker                                                                                                                                                                  "dockerd-entrypoint.…"   2 weeks ago         Exited (1) 2 weeks ago                          vibrant_saha
+ffb9230c78ca        mysql:5.7                                                                                                                                                               "docker-entrypoint.s…"   7 weeks ago         Exited (0) 8 days ago                           mysql1
+ba1c0f8b321b        mysql:5.7                                                                                                                                                               "docker-entrypoint.s…"   7 weeks ago         Exited (0) 8 days ago                           mysql0
+36651cf5d62d        89cd71f28010                                                                                                                                                            "peer node start"        7 weeks ago         Exited (1) 7 weeks ago                          peer0.hospital.network.com
+a81d2f9d247d        b89bce05c7db                                                                                                                                                            "orderer"                7 weeks ago         Exited (2) 7 weeks ago                          orderer2.network.com
+f5a70e2e4efe        b967e8b98b6b                                                                                                                                                            "tini -- /docker-ent…"   7 weeks ago         Exited (143) 7 weeks ago                        couchdb5
+c6c1acf6f86f        b967e8b98b6b                                                                                                                                                            "tini -- /docker-ent…"   7 weeks ago         Exited (143) 7 weeks ago                        couchdb3
+798bb92dd295        b967e8b98b6b                                                                                                                                                            "tini -- /docker-ent…"   7 weeks ago         Exited (143) 7 weeks ago                        couchdb4
+1315085cbcf9        b89bce05c7db                                                                                                                                                            "orderer"                7 weeks ago         Exited (2) 7 weeks ago                          orderer.network.com
+d8df4ea852d5        89cd71f28010                                                                                                                                                            "peer node start"        7 weeks ago         Exited (1) 7 weeks ago                          peer0.generalservices.network.com
+64eda518cf8c        b967e8b98b6b                                                                                                                                                            "tini -- /docker-ent…"   7 weeks ago         Exited (143) 7 weeks ago                        couchdb0
+7895ef5e7742        89cd71f28010                                                                                                                                                            "peer node start"        7 weeks ago         Exited (1) 7 weeks ago                          peer0.cardiology.network.com
+9c87e1505a2b        89cd71f28010                                                                                                                                                            "peer node start"        7 weeks ago         Exited (1) 7 weeks ago                          peer1.generalservices.network.com
+2c7145fdf7ce        89cd71f28010                                                                                                                                                            "peer node start"        7 weeks ago         Exited (1) 7 weeks ago                          peer1.cardiology.network.com
+cfd2374bc63f        b967e8b98b6b                                                                                                                                                            "tini -- /docker-ent…"   7 weeks ago         Exited (143) 7 weeks ago                        couchdb1
+851ed73df956        89cd71f28010                                                                                                                                                            "peer node start"        7 weeks ago         Exited (1) 7 weeks ago                          peer1.hospital.network.com
+0b39a009aa73        b89bce05c7db                                                                                                                                                            "orderer"                7 weeks ago         Exited (2) 7 weeks ago                          orderer3.network.com
+83b6b781869e        b967e8b98b6b                                                                                                                                                            "tini -- /docker-ent…"   7 weeks ago         Exited (143) 7 weeks ago                        couchdb2
+0c432484772f        c2449e2873d5                                                                                                                                                            "sh -c 'fabric-ca-se…"   7 weeks ago         Exited (137) 7 weeks ago                        ca.generalservices.network.com
+cecd405df51a        c2449e2873d5                                                                                                                                                            "sh -c 'fabric-ca-se…"   7 weeks ago         Exited (137) 7 weeks ago                        ca_orderer
+45a71b2de2aa        c2449e2873d5                                                                                                                                                            "sh -c 'fabric-ca-se…"   7 weeks ago         Exited (137) 7 weeks ago                        ca.hospital.network.com
+2353880b423b        c2449e2873d5                                                                                                                                                            "sh -c 'fabric-ca-se…"   7 weeks ago         Exited (137) 7 weeks ago                        ca.cardiology.network.com
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/fabric-samples/test-network/docker$ docker-compose -f docker-compose-pg.yaml up
+Recreating docker_db_1
+Attaching to docker_db_1
+db_1  | popen failure: Cannot allocate memory
+db_1  | initdb: error: The program "postgres" is needed by initdb but was not found in the
+db_1  | same directory as "/usr/lib/postgresql/14/bin/initdb".
+db_1  | Check your installation.
+docker_db_1 exited with code 1
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/fabric-samples/test-network/docker$ docker-compose -f docker-compose-pg.yaml up
+Pulling db (postgres:12)...
+12: Pulling from library/postgres
+f11c1adaa26e: Already exists
+11d2a01831db: Pull complete
+fa447fe1d1e0: Pull complete
+55dfde07a6e2: Pull complete
+6e2f390664fe: Pull complete
+4a83e9d155a5: Pull complete
+b0c78f8d445e: Pull complete
+78c00a725bfb: Pull complete
+3e550db355aa: Pull complete
+7f17fea255df: Pull complete
+81e4556ced8e: Pull complete
+74fabc3fa2b5: Pull complete
+c643770cc740: Pull complete
+ee6f27a9034c: Pull complete
+Digest: sha256:65f369edca4ada0ceb15ba09745cb604d6853dce5a42f6734d045ee8e452ece8
+Status: Downloaded newer image for postgres:12
+Recreating docker_db_1
+Attaching to docker_db_1
+db_1  | popen failure: Cannot allocate memory
+db_1  | initdb: error: The program "postgres" is needed by initdb but was not found in the
+db_1  | same directory as "/usr/lib/postgresql/12/bin/initdb".
+db_1  | Check your installation.
+docker_db_1 exited with code 1
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/fabric-samples/test-network/docker$ docker-compose -f docker-compose-pg.yaml down
+Removing docker_db_1 ... done
+Removing network docker_default
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/fabric-samples/test-network/docker$ docker-compose -f docker-compose-pg.yaml up 
+Creating network "docker_default" with the default driver
+Pulling db (postgres:11)...
+11: Pulling from library/postgres
+bff3e048017e: Pull complete
+e3e180bf7c2b: Pull complete
+62eff3cc0cff: Pull complete
+3d90a128d4ff: Pull complete
+ba4ce0c5ab29: Pull complete
+a8f4b87076a9: Pull complete
+4b437d281a7e: Pull complete
+f1841d9dcb17: Pull complete
+bf897300657d: Pull complete
+3bfdfb831df4: Pull complete
+c44ac1fcc543: Pull complete
+9ad3441d354a: Pull complete
+2d79312566dd: Pull complete
+Digest: sha256:5d2aa4a7b5f9bdadeddcf87cf7f90a176737a02a30d917de4ab2e6a329bd2d45
+Status: Downloaded newer image for postgres:11
+Creating docker_db_1
+Attaching to docker_db_1
+db_1  | The files belonging to this database system will be owned by user "postgres".
+db_1  | This user must also own the server process.
+db_1  | 
+db_1  | The database cluster will be initialized with locale "C.UTF-8".
+db_1  | The default database encoding has accordingly been set to "UTF8".
+db_1  | The default text search configuration will be set to "english".
+db_1  | 
+db_1  | Data page checksums are disabled.
+db_1  | 
+db_1  | fixing permissions on existing directory /var/lib/postgresql/data ... ok
+db_1  | creating subdirectories ... ok
+db_1  | selecting default max_connections ... 100
+db_1  | selecting default shared_buffers ... 128MB
+db_1  | selecting default timezone ... Etc/UTC
+db_1  | selecting dynamic shared memory implementation ... posix
+db_1  | creating configuration files ... ok
+db_1  | running bootstrap script ... ok
+db_1  | performing post-bootstrap initialization ... ok
+db_1  | syncing data to disk ... 
+db_1  | WARNING: enabling "trust" authentication for local connections
+db_1  | You can change this by editing pg_hba.conf or using the option -A, or
+db_1  | --auth-local and --auth-host, the next time you run initdb.
+db_1  | ok
+db_1  | 
+db_1  | Success. You can now start the database server using:
+db_1  | 
+db_1  |     pg_ctl -D /var/lib/postgresql/data -l logfile start
+db_1  | 
+db_1  | waiting for server to start....2024-07-16 10:12:05.539 UTC [47] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+db_1  | 2024-07-16 10:12:05.552 UTC [48] LOG:  database system was shut down at 2024-07-16 10:12:05 UTC
+db_1  | 2024-07-16 10:12:05.556 UTC [47] LOG:  database system is ready to accept connections
+db_1  |  done
+db_1  | server started
+db_1  | CREATE DATABASE
+db_1  | 
+db_1  | 
+db_1  | /usr/local/bin/docker-entrypoint.sh: ignoring /docker-entrypoint-initdb.d/*
+db_1  | 
+db_1  | waiting for server to shut down....2024-07-16 10:12:06.003 UTC [47] LOG:  received fast shutdown request
+db_1  | 2024-07-16 10:12:06.004 UTC [47] LOG:  aborting any active transactions
+db_1  | 2024-07-16 10:12:06.008 UTC [47] LOG:  background worker "logical replication launcher" (PID 54) exited with exit code 1
+db_1  | 2024-07-16 10:12:06.008 UTC [49] LOG:  shutting down
+db_1  | 2024-07-16 10:12:06.027 UTC [47] LOG:  database system is shut down
+db_1  |  done
+db_1  | server stopped
+db_1  | 
+db_1  | PostgreSQL init process complete; ready for start up.
+db_1  | 
+db_1  | 2024-07-16 10:12:06.131 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+db_1  | 2024-07-16 10:12:06.131 UTC [1] LOG:  listening on IPv6 address "::", port 5432
+db_1  | 2024-07-16 10:12:06.134 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+db_1  | 2024-07-16 10:12:06.155 UTC [75] LOG:  database system was shut down at 2024-07-16 10:12:06 UTC
+db_1  | 2024-07-16 10:12:06.160 UTC [1] LOG:  database system is ready to accept connections
+^CGracefully stopping... (press Ctrl+C again to force)
+Stopping docker_db_1 ... done
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/fabric-samples/test-network/docker$ docker-compose -f docker-compose-pg.yaml up -d
+Starting docker_db_1
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/fabric-samples/test-network/docker$ docker ps
+CONTAINER ID        IMAGE               COMMAND                  CREATED              STATUS              PORTS                     NAMES
+4e4774e04dfc        postgres:11         "docker-entrypoint.s…"   About a minute ago   Up 3 seconds        0.0.0.0:15432->5432/tcp   docker_db_1
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/fabric-samples/test-network/docker$ psql
+bash: /usr/bin/psql: Aucun fichier ou dossier de ce type
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/fabric-samples/test-network/docker$ 
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/fabric-samples/test-network/docker$ docker run --rm --name timescale-pg-11 -p 127.0.0.1:5112:5432 -v $HOME/docker/volumes/timescale-pg-11/var/lib/postgresql/data -e POSTGRES_PASSWORD=postgres -d timescale/timescaledb:latest-pg11 
+Unable to find image 'timescale/timescaledb:latest-pg11' locally
+latest-pg11: Pulling from timescale/timescaledb
+5843afab3874: Pull complete 
+525703b16f79: Pull complete 
+86f8340bd3d9: Pull complete 
+d13ca52aca5f: Pull complete 
+bc8e5c77a726: Pull complete 
+9384a66ff102: Pull complete 
+298ce741d1c2: Pull complete 
+f62a95b041ff: Pull complete 
+076a85e06411: Pull complete 
+509a12f75c63: Pull complete 
+741765961cb8: Pull complete 
+d9e8ede31860: Pull complete 
+05f3bf346aa6: Pull complete 
+Digest: sha256:c38abaa850194667f3813e8244dd780bc201cce3ed05882db9735d666de2f46c
+Status: Downloaded newer image for timescale/timescaledb:latest-pg11
+070c15bb1c4f2680550e766cf9507ee2f22ebd1117b076e2d7e24868b379d539
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/fabric-samples/test-network/docker$ docker exec -it docker_db_1 psql -U postgres -d masters
+psql (11.16 (Debian 11.16-1.pgdg90+1))
+Type "help" for help.
+
+masters=# psql -h localhost -p 15432 -U postgres -d masters
+masters-# 
+masters-# \q
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/fabric-samples/test-network/docker$ psql -h localhost -p 15432 -U postgres -d masters
+bash: /usr/bin/psql: Aucun fichier ou dossier de ce type
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/fabric-samples/test-network/docker$ docker exec -it docker_db_1 psql -U postgres -d masters
+psql (11.16 (Debian 11.16-1.pgdg90+1))
+Type "help" for help.
+
+masters=# \l
+                              List of databases
+   Name    |  Owner   | Encoding | Collate |  Ctype  |   Access privileges   
+-----------+----------+----------+---------+---------+-----------------------
+ masters   | postgres | UTF8     | C.UTF-8 | C.UTF-8 | 
+ postgres  | postgres | UTF8     | C.UTF-8 | C.UTF-8 | 
+ template0 | postgres | UTF8     | C.UTF-8 | C.UTF-8 | =c/postgres          +
+           |          |          |         |         | postgres=CTc/postgres
+ template1 | postgres | UTF8     | C.UTF-8 | C.UTF-8 | =c/postgres          +
+           |          |          |         |         | postgres=CTc/postgres
+(4 rows)
+
+masters=# \c masters
+You are now connected to database "masters" as user "postgres".
+masters=# \dt
+Did not find any relations.
+masters=# \q
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/fabric-samples/test-network/docker$ docker ps
+CONTAINER ID        IMAGE                               COMMAND                  CREATED              STATUS              PORTS                      NAMES
+070c15bb1c4f        timescale/timescaledb:latest-pg11   "docker-entrypoint.s…"   About a minute ago   Up About a minute   127.0.0.1:5112->5432/tcp   timescale-pg-11
+4e4774e04dfc        postgres:11                         "docker-entrypoint.s…"   9 minutes ago        Up 8 minutes        0.0.0.0:15432->5432/tcp    docker_db_1
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/fabric-samples/test-network/docker$ docker exec -it timescale-pg-11 psql -U postgres -d masters
+psql: FATAL:  database "masters" does not exist
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/fabric-samples/test-network/docker$ docker exec -it timescale-pg-11 psql -U postgres
+psql (11.12)
+Type "help" for help.
+
+postgres=# CREATE DATABASE masters;
+CREATE DATABASE
+postgres=# \c masters
+You are now connected to database "masters" as user "postgres".
+masters=# CREATE TABLE conditions (
+masters(#     time        TIMESTAMPTZ       NOT NULL,
+masters(#     location    TEXT              NOT NULL,
+masters(#     temperature DOUBLE PRECISION  NULL,
+masters(#     humidity    DOUBLE PRECISION  NULL
+masters(# );
+CREATE TABLE
+masters=# SELECT create_hypertable('conditions', 'time');
+    create_hypertable    
+-------------------------
+ (1,public,conditions,t)
+(1 row)
+
+masters=# INSERT INTO conditions (time, location, temperature, humidity) 
+masters-# VALUES 
+masters-# ('2024-07-16 10:00:00', 'New York', 25.3, 60.2),
+masters-# ('2024-07-16 11:00:00', 'New York', 26.1, 58.7),
+masters-# ('2024-07-16 12:00:00', 'New York', 27.0, 55.3);
+INSERT 0 3
+masters=# SELECT * FROM conditions;
+          time          | location | temperature | humidity 
+------------------------+----------+-------------+----------
+ 2024-07-16 10:00:00+00 | New York |        25.3 |     60.2
+ 2024-07-16 11:00:00+00 | New York |        26.1 |     58.7
+ 2024-07-16 12:00:00+00 | New York |          27 |     55.3
+(3 rows)
+
+masters=# ^D\q
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/fabric-samples/test-network/docker$ SELECT * FROM conditions;
+SELECT : commande introuvable
+ruzgarkartali@ruzgarkartali-HP-Laptop:~/Documents/TFE/fabric-samples/test-network/docker$ 
+
