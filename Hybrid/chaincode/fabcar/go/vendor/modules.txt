@@ -1,7 +1,5 @@
 # filippo.io/edwards25519 v1.1.0
 ## explicit; go 1.20
-filippo.io/edwards25519
-filippo.io/edwards25519/field
 # github.com/PuerkitoBio/purell v1.1.1
 ## explicit
 github.com/PuerkitoBio/purell
@@ -22,7 +20,6 @@ github.com/go-openapi/spec
 github.com/go-openapi/swag
 # github.com/go-sql-driver/mysql v1.8.1
 ## explicit; go 1.18
-github.com/go-sql-driver/mysql
 # github.com/gobuffalo/envy v1.7.0
 ## explicit
 github.com/gobuffalo/envy
@@ -65,6 +62,11 @@ github.com/hyperledger/fabric-protos-go/peer
 # github.com/joho/godotenv v1.3.0
 ## explicit
 github.com/joho/godotenv
+# github.com/lib/pq v1.10.9
+## explicit; go 1.13
+github.com/lib/pq
+github.com/lib/pq/oid
+github.com/lib/pq/scram
 # github.com/mailru/easyjson v0.0.0-20190626092158-b2ccc519800e
 ## explicit
 github.com/mailru/easyjson/buffer

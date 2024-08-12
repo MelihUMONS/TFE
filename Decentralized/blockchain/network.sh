@@ -338,8 +338,6 @@ function networkUp() {
 
   IMAGE_TAG=$IMAGETAG docker-compose ${COMPOSE_FILES} up -d 2>&1
   
-  cd docker
-  docker-compose -f docker-compose-mysql.yaml up -d
 
   docker ps -a
   if [ $? -ne 0 ]; then
@@ -492,7 +490,7 @@ VERSION=1
 # default image tag
 IMAGETAG="latest"
 # default database
-DATABASE="leveldb"
+DATABASE="couchdb"
 
 # Parse commandline args
 

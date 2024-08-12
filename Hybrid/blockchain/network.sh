@@ -339,7 +339,8 @@ function networkUp() {
   IMAGE_TAG=$IMAGETAG docker-compose ${COMPOSE_FILES} up -d 2>&1
   
   cd docker
-  docker-compose -f docker-compose-mysql.yaml up -d
+  docker-compose -f docker-compose-pg.yaml up -d
+  psql "host=127.0.0.1 port=5112 user=postgres password=postgres sslmode=disable" -c "create database hybrid;"
 
   docker ps -a
   if [ $? -ne 0 ]; then

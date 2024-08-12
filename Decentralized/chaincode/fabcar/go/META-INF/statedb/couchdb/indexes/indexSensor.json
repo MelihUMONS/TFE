@@ -1,0 +1,9 @@
+{
+  "index": {
+    "fields": ["SensorId"]
+  },
+  "ddoc": "indexSensorDoc",
+  "name": "indexSensor",
+  "type": "json"
+}
+

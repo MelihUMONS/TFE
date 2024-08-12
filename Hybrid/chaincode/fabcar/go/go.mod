@@ -3,8 +3,8 @@ module github.com/hyperledger/fabric-samples/chaincode/fabcar/go
 go 1.17
 
 require (
-	github.com/go-sql-driver/mysql v1.8.1
 	github.com/hyperledger/fabric-contract-api-go v1.0.0
+	github.com/lib/pq v1.10.9
 )
 
 require (
@@ -15,6 +15,7 @@ require (
 	github.com/go-openapi/jsonreference v0.19.2 // indirect
 	github.com/go-openapi/spec v0.19.4 // indirect
 	github.com/go-openapi/swag v0.19.5 // indirect
+	github.com/go-sql-driver/mysql v1.8.1 // indirect
 	github.com/gobuffalo/envy v1.7.0 // indirect
 	github.com/gobuffalo/packd v0.3.0 // indirect
 	github.com/gobuffalo/packr v1.30.1 // indirect

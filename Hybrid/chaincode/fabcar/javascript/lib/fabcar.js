@@ -1,7 +1,7 @@
 'use strict';
 
 const { Contract } = require('fabric-contract-api');
-const mysql = require('mysql');
+const pgp = require('pg-promise')();
 const crypto = require('crypto');
 const fs = require('fs');
 const { exec } = require('child_process');
@@ -18,32 +18,29 @@ class FabCar extends Contract {
     // ############################################################################
     // ############################################################################
 
-
-    async connectToDatabase(mysqlConnStr) {
+    async connectToDatabase(timescaleConnStr) {
         return new Promise((resolve, reject) => {
-            const connection = mysql.createConnection(mysqlConnStr);
-            connection.connect(error => {
-                if (error) {
-                    console.error('Error connecting to MySQL:', error);
-                    reject(error);
-                } else {
-                    console.info('MySQL connection established');
-                    resolve(connection);
-                }
-            });
+            try {
+                const db = pgp(timescaleConnStr);
+                console.info('TimescaleDB connection established');
+                resolve(db);
+            } catch (error) {
+                console.error('Error connecting to TimescaleDB:', error);
+                reject(error);
+            }
         });
     }
 
-    async runQuery(connection, query, params = []) {
+    async runQuery(db, query, params = []) {
         return new Promise((resolve, reject) => {
-            connection.query(query, params, (error, results) => {
-                if (error) {
+            db.any(query, params)
+                .then(results => {
+                    resolve(results);
+                })
+                .catch(error => {
                     console.error('Error executing query:', error);
                     reject(error);
-                } else {
-                    resolve(results);
-                }
-            });
+                });
         });
     }
 
@@ -53,7 +50,7 @@ class FabCar extends Contract {
             console.info(`Created folder: ${folderPath}`);
         }
     }
-    
+
     async appendToFile(filePath, dataList) {
         if (!fs.existsSync(filePath)) {
             fs.writeFileSync(filePath, '');
@@ -84,20 +81,24 @@ class FabCar extends Contract {
         console.info('============= START : Initialize Ledger ===========');
 
         //create database
-        const mysqlConnStr = {host: "172.17.0.1", port: 3306, user: "root", password: "rootpassword0"};
-        const connection = await this.connectToDatabase(mysqlConnStr);
-        const dbName = process.env.HOSTNAME;
-        this.sleep(1000);
-        console.log(typeof connection);
-        await this.runQuery(connection,`CREATE DATABASE IF NOT EXISTS ${mysql.escapeId(dbName)}`);
+        const timescaleConnStr = 'postgres://myuser:rootpassword@172.17.0.1:5432/postgres';
+        const db = await this.connectToDatabase(timescaleConnStr);
 
-        //create table _keys
-        const dbConnStr = {...mysqlConnStr, database: dbName};
-        const dbConnection = await this.connectToDatabase(dbConnStr); 
-        await this.runQuery(dbConnection,'CREATE TABLE IF NOT EXISTS _keys (sensorId TEXT, _key TEXT);');
+        const dbName = process.env.HOSTNAME;
+
+        // Create the database if it doesn't exist
+        await this.runQuery(db, `CREATE DATABASE ${dbName}`);
+
+        // Connect to the new database
+        const dbConnStr = `postgres://myuser:rootpassword@172.17.0.1:5432/${dbName}`;
+        const dbConnection = await this.connectToDatabase(dbConnStr);
+
+        // Create the _keys table
+        await this.runQuery(dbConnection, 'CREATE TABLE IF NOT EXISTS _keys (sensorId TEXT, _key TEXT);');
 
         console.info('============= END : Initialize Ledger ===========');
     }
+
 
     async AddSensor(ctx, sensorstr, a_str, b_str) {
         console.info('============= START : AddSensor ===========');
@@ -253,54 +254,6 @@ class FabCar extends Contract {
 
         return JSON.stringify(results);
     }
-
-
-    async SendFingerprint(ctx){
-        let fingerprint = "ERROR";
-        let cmd = `MYSQL_PWD=rootpassword0 mysqldump -h 172.17.0.1 -P 3306 -u root --no-create-info --skip-comments --compact --ignore-table=${env.HOSTNAME}._keys ${env.HOSTNAME} | md5sum`
-        
-        exec(cmd, (error, stdout, stderr) => {
-            if (error) {
-                console.error(`exec error: ${error}`);
-                return;
-            }
-            if (stderr) {
-                console.error(`stderr: ${stderr}`);
-                return;
-            }
-            fingerprint = stdout.replace(/\s+-\s*$/, '').trim();
-        });
-
-        fetch(`http://localhost:5000/?peerId=${env.HOSTNAME}&fingerprint="${fingerprint}`);
-    }
-
-    async endorseCeremony(ctx, good_fingerprint) {
-        console.info('============= START : endorseCeremony ===========');
-
-        // Generate a unique key for the fingerprint record
-        const fingerprintKey = `fingerprint_${new Date().toISOString()}`;
-
-        // Create the fingerprint object
-        const fingerprintRecord = {
-            fingerprint: good_fingerprint,
-            timestamp: new Date().toISOString()
-        };
-
-        // Put the fingerprint on the ledger
-        await ctx.stub.putState(fingerprintKey, Buffer.from(JSON.stringify(fingerprintRecord)));
-
-        console.info('============= END : endorseCeremony ===========');
-    }
-
-    async testUpdate(ctx, good_fingerprint) {
-        console.info('============= START : testUpdate ===========');
-        
-
-        console.info('============= END : testUpdate ===========');
-        return "Updated !"
-    }
-
-
 }
 
 module.exports = FabCar;

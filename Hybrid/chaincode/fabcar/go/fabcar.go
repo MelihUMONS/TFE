@@ -4,19 +4,18 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/sha256"
+	"crypto/rand"
 	"database/sql"
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"log"
 	"math/big"
-	"net/http"
 	"os"
-	"os/exec"
 	"strings"
 	"time"
 
-	_ "github.com/go-sql-driver/mysql"
+	_ "github.com/lib/pq"
 	"github.com/hyperledger/fabric-contract-api-go/contractapi"
 )
 
@@ -34,16 +33,30 @@ type Data struct {
 	Data string `json:"data"`
 }
 
-func (s *FabCar) connectToDatabase(mysqlConnStr string) (*sql.DB, error) {
-	db, err := sql.Open("mysql", mysqlConnStr)
-	if err != nil {
-		log.Printf("Error connecting to MySQL: %s", err)
-		return nil, err
+func (s *FabCar) connectToPostgres(dbName string) (*sql.DB, error) {
+	var connStr string
+	if dbName == "" {
+		connStr = "host=172.17.0.1 port=5112 user=postgres password=postgres sslmode=disable"
+	} else {
+		connStr = fmt.Sprintf("host=172.17.0.1 port=5112 user=postgres password=postgres dbname=%s sslmode=disable", dbName)
 	}
+
+	db, err := sql.Open("postgres", connStr)
+	if err != nil {
+		return nil, fmt.Errorf("failed to open connection: %v", err)
+	}
+
+	// Ping the database to check if the connection is actually established
+	if err := db.Ping(); err != nil {
+		return nil, fmt.Errorf("failed to connect to database: %v", err)
+	}
+
+	fmt.Println("Successfully connected to TimescaleDB!")
 	return db, nil
 }
 
 func (s *FabCar) runQuery(db *sql.DB, query string, args ...interface{}) (*sql.Rows, error) {
+
 	return db.Query(query, args...)
 }
 
@@ -54,14 +67,14 @@ func (s *FabCar) createFolderIfNotExists(folderPath string) error {
 func (s *FabCar) appendToFile(filePath string, dataList []Data) error {
 	f, err := os.OpenFile(filePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
-		return err
+		fmt.Println(err);return err
 	}
 	defer f.Close()
 
 	for _, data := range dataList {
 		content := fmt.Sprintf("%s;%s\n", data.Date, data.Data)
 		if _, err := f.WriteString(content); err != nil {
-			return err
+			fmt.Println(err);return err
 		}
 	}
 	return nil
@@ -73,49 +86,42 @@ func (s *FabCar) sleep(ms int) {
 
 func (s *FabCar) InitLedger(ctx contractapi.TransactionContextInterface) error {
 	log.Println("============= START : Initialize Ledger ===========")
-	mysqlConnStr := "root:rootpassword0@tcp(172.17.0.1:3306)/"
-	db, err := s.connectToDatabase(mysqlConnStr)
+
+	db, err := s.connectToPostgres("")
 	if err != nil {
-		return err
+		fmt.Println(err);return err
 	}
 	defer db.Close()
 
 	dbName := os.Getenv("HOSTNAME")
-	s.sleep(1000)
-
-	_, err = s.runQuery(db, fmt.Sprintf("CREATE DATABASE IF NOT EXISTS %s", dbName))
+	fmt.Println(dbName)
+	_, err = s.runQuery(db, fmt.Sprintf(`CREATE DATABASE "%s" ;`, dbName))
 	if err != nil {
-		return err
+		fmt.Println(err);return err
 	}
 
-	dbConnStr := fmt.Sprintf("root:rootpassword0@tcp(172.17.0.1:3306)/%s", dbName)
-	db, err = s.connectToDatabase(dbConnStr)
+	db, err = s.connectToPostgres(dbName)
 	if err != nil {
-		return err
+		fmt.Println(err);return err
 	}
 	defer db.Close()
 
-	_, err = s.runQuery(db, "CREATE TABLE IF NOT EXISTS _keys (sensorId TEXT, _key TEXT);")
+	_, err = s.runQuery(db, "CREATE TABLE IF NOT EXISTS _keys (sensorId TEXT UNIQUE, _key TEXT);")
 	if err != nil {
-		return err
+		fmt.Println(err);return err
 	}
 
 	log.Println("============= END : Initialize Ledger ===========")
 	return nil
 }
 
-func (s *FabCar) AddSensor(ctx contractapi.TransactionContextInterface, sensorStr, aStr, bStr string) error {
-	log.Println("============= START : AddSensor ===========")
-	mysqlConnStr := fmt.Sprintf("root:rootpassword0@tcp(172.17.0.1:3306)/%s", os.Getenv("HOSTNAME"))
-	db, err := s.connectToDatabase(mysqlConnStr)
-	if err != nil {
-		return err
-	}
-	defer db.Close()
+func (s *FabCar) AddSensorKeys(ctx contractapi.TransactionContextInterface, sensorStr, aStr, bStr string) error {
+	log.Println("============= START : AddSensorKeys ===========")
 
 	var sensor Sensor
-	err = json.Unmarshal([]byte(sensorStr), &sensor)
+	err := json.Unmarshal([]byte(sensorStr), &sensor)
 	if err != nil {
+		fmt.Println(err)
 		return err
 	}
 
@@ -137,8 +143,15 @@ func (s *FabCar) AddSensor(ctx contractapi.TransactionContextInterface, sensorSt
 
 	sensor.SharedKey = fmt.Sprintf("%s|%s", skX.String(), skY.String())
 
-	mkX := new(big.Int)
-	mkX.SetString(fmt.Sprintf("%x", sha256.Sum256([]byte(sensorStr))), 16)
+	n := 256
+
+	// Générer un grand nombre aléatoire
+	mkX, err := rand.Int(rand.Reader, new(big.Int).Lsh(big.NewInt(1), uint(n)))
+	if err != nil {
+		fmt.Println("Erreur lors de la génération du nombre aléatoire :", err)
+		return err
+	}
+
 
 	mkY := new(big.Int)
 	mkY.Mul(a, mkX)
@@ -147,23 +160,76 @@ func (s *FabCar) AddSensor(ctx contractapi.TransactionContextInterface, sensorSt
 
 	myKey := fmt.Sprintf("%s|%s", mkX.String(), mkY.String())
 
-	_, err = s.runQuery(db, fmt.Sprintf("CREATE TABLE IF NOT EXISTS %s (date DATETIME DEFAULT CURRENT_TIMESTAMP, data TEXT);", sensor.SensorID))
+	dbName := os.Getenv("HOSTNAME")
+	db, err := s.connectToPostgres(dbName)
 	if err != nil {
+		fmt.Println(err)
 		return err
 	}
+	defer db.Close()
 
-	_, err = s.runQuery(db, "INSERT INTO _keys (sensorId, _key) VALUES (?, ?)", sensor.SensorID, myKey)
+	_, err = s.runQuery(db, fmt.Sprintf("INSERT INTO _keys (sensorId, _key) VALUES ('%s', '%s')", sensor.SensorID, myKey))
 	if err != nil {
+		fmt.Println(err)
 		return err
 	}
 
 	sensorJSON, err := json.Marshal(sensor)
 	if err != nil {
+		fmt.Println(err)
 		return err
 	}
 
 	err = ctx.GetStub().PutState(sensor.SensorID, sensorJSON)
 	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+
+	log.Println("============= END : AddSensorKeys ===========")
+	return nil
+}
+
+func (s *FabCar) AddSensor(ctx contractapi.TransactionContextInterface, sensorStr, aStr, bStr string) error {
+	log.Println("============= START : AddSensor ===========")
+
+	var sensor Sensor
+	err := json.Unmarshal([]byte(sensorStr), &sensor)
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+
+	db, err := s.connectToPostgres("hybrid")
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+	defer db.Close()
+
+	_, err = s.runQuery(db, fmt.Sprintf(`
+	CREATE TABLE IF NOT EXISTS %s (
+		time TIMESTAMPTZ NOT NULL,
+		data TEXT
+	);`, sensor.SensorID))
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+
+	// Convertir la table en hypertable
+	_, err = s.runQuery(db, fmt.Sprintf(`
+	SELECT create_hypertable('%s', 'time');`, sensor.SensorID))
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+
+	// Ajouter des index sur la colonne temporelle
+	_, err = s.runQuery(db, fmt.Sprintf(`
+	CREATE INDEX ON %s (time);`, sensor.SensorID))
+	if err != nil {
+		fmt.Println(err)
 		return err
 	}
 
@@ -171,24 +237,25 @@ func (s *FabCar) AddSensor(ctx contractapi.TransactionContextInterface, sensorSt
 	return nil
 }
 
+
 func (s *FabCar) InsertData(ctx contractapi.TransactionContextInterface, sensorID, dataStr string) error {
 	log.Println("============= START : InsertData ===========")
 	var data []Data
 	err := json.Unmarshal([]byte(dataStr), &data)
 	if err != nil {
-		return err
+		fmt.Println(err);return err
 	}
 
-	mysqlConnStr := fmt.Sprintf("root:rootpassword0@tcp(172.17.0.1:3306)/%s", os.Getenv("HOSTNAME"))
-	db, err := s.connectToDatabase(mysqlConnStr)
+	dbName := os.Getenv("HOSTNAME")
+	db, err := s.connectToPostgres(dbName)
 	if err != nil {
-		return err
+		fmt.Println(err);return err
 	}
 	defer db.Close()
 
 	sensorAsBytes, err := ctx.GetStub().GetState(sensorID)
 	if err != nil {
-		return err
+		fmt.Println(err);return err
 	}
 	if sensorAsBytes == nil {
 		return fmt.Errorf("%s does not exist", sensorID)
@@ -197,27 +264,27 @@ func (s *FabCar) InsertData(ctx contractapi.TransactionContextInterface, sensorI
 	var sensor Sensor
 	err = json.Unmarshal(sensorAsBytes, &sensor)
 	if err != nil {
-		return err
+		fmt.Println(err);return err
 	}
 
-	rows, err := s.runQuery(db, "SELECT _key FROM _keys WHERE sensorId = ?", sensor.SensorID)
+	rows, err := s.runQuery(db, fmt.Sprintf("SELECT _key FROM _keys WHERE sensorId = '%s'", sensor.SensorID))
 	if err != nil {
-		return err
+		fmt.Println(err);return err
 	}
 	defer rows.Close()
-
+	
 	var myKey string
 	if rows.Next() {
 		err := rows.Scan(&myKey)
 		if err != nil {
-			return err
+			fmt.Println(err);return err
 		}
 	} else {
 		return fmt.Errorf("no results found for the given sensorId")
 	}
 
-	skXStr, skYStr := splitKey(myKey)
-	mkXStr, mkYStr := splitKey(sensor.SharedKey)
+	skXStr, skYStr := splitKey(sensor.SharedKey)
+	mkXStr, mkYStr := splitKey(myKey)
 
 	skX := new(big.Int)
 	skX.SetString(skXStr, 10)
@@ -240,37 +307,47 @@ func (s *FabCar) InsertData(ctx contractapi.TransactionContextInterface, sensorI
 	secret.Add(secret, b)
 
 	secretStr := secret.String()
+	fmt.Println("Le secret est ")
+	fmt.Println(secretStr)
+
 	if len(secretStr) < 32 {
 		secretStr = fmt.Sprintf("%032s", secretStr)
 	}
 	secretBuffer := sha256.Sum256([]byte(secretStr[len(secretStr)-32:]))
 
-	
 
-	for i, d := range data {
+	db, err = s.connectToPostgres("hybrid")
+	if err != nil {
+		fmt.Println(err);return err
+	}
+	defer db.Close()
+
+	// Construire la requête d'insertion
+	query := fmt.Sprintf("INSERT INTO %s (time, data) VALUES ", sensorID)
+
+	var values []string
+	for _, d := range data {
 		ciphertext, err := encrypt(secretBuffer[:], []byte(d.Data))
 		if err != nil {
+			fmt.Println(err)
 			return err
 		}
-		data[i].Data = hex.EncodeToString(ciphertext) // Update the data to be the encrypted value
+		encryptedData := hex.EncodeToString(ciphertext)
+		value := fmt.Sprintf("('%s', '%s')", d.Date, encryptedData)
+		values = append(values, value)
 	}
 
-	for _, d := range data {
-		_, err = s.runQuery(db, fmt.Sprintf("INSERT INTO %s (date, data) VALUES (?, ?)", sensorID), d.Date, d.Data)
-		if err != nil {
-			log.Printf("Failed to add data in MySQL: %s", err)
-			log.Printf("Data will be stored to a temporary file!")
+	// Ajouter toutes les valeurs à la requête
+	query += strings.Join(values, ", ")
 
-			folderPath := "/tmp/sql_queue"
-			filePath := fmt.Sprintf("%s/%s.txt", folderPath, sensorID)
-			if err := s.createFolderIfNotExists(folderPath); err != nil {
-				return err
-			}
-			if err := s.appendToFile(filePath, data); err != nil {
-				return err
-			}
-		}
+	fmt.Println("Executing INSERT query ... ")
+	// Exécuter la requête d'insertion
+	_, err = s.runQuery(db, query)
+	if err != nil {
+		fmt.Println(err)
+		return err
 	}
+
 
 	log.Println("============= END : InsertData ===========")
 	return nil
@@ -281,12 +358,13 @@ func (s *FabCar) InsertData(ctx contractapi.TransactionContextInterface, sensorI
 
 func (s *FabCar) ReadData(ctx contractapi.TransactionContextInterface, sensorID string) (string, error) {
 	log.Println("============= START : ReadData ===========")
-	mysqlConnStr := fmt.Sprintf("root:rootpassword0@tcp(172.17.0.1:3306)/%s", os.Getenv("HOSTNAME"))
-	db, err := s.connectToDatabase(mysqlConnStr)
+	dbName := os.Getenv("HOSTNAME")
+	db, err := s.connectToPostgres(dbName)
 	if err != nil {
-		return "", err
+		return "",err
 	}
 	defer db.Close()
+
 
 	sensorAsBytes, err := ctx.GetStub().GetState(sensorID)
 	if err != nil {
@@ -302,7 +380,7 @@ func (s *FabCar) ReadData(ctx contractapi.TransactionContextInterface, sensorID 
 		return "", err
 	}
 
-	rows, err := s.runQuery(db, "SELECT _key FROM _keys WHERE sensorId = ?", sensor.SensorID)
+	rows, err := s.runQuery(db, fmt.Sprintf("SELECT _key FROM _keys WHERE sensorId = '%s'", sensor.SensorID))
 	if err != nil {
 		return "", err
 	}
@@ -347,6 +425,14 @@ func (s *FabCar) ReadData(ctx contractapi.TransactionContextInterface, sensorID 
 	}
 	secretBuffer := sha256.Sum256([]byte(secretStr[len(secretStr)-32:]))
 
+
+	db, err = s.connectToPostgres("hybrid")
+	if err != nil {
+		return "",err
+	}
+	defer db.Close()
+
+
 	rows, err = s.runQuery(db, fmt.Sprintf("SELECT * FROM %s", sensorID))
 	if err != nil {
 		return "", err
@@ -379,53 +465,247 @@ func (s *FabCar) ReadData(ctx contractapi.TransactionContextInterface, sensorID 
 	return string(resultJSON), nil
 }
 
+func (s *FabCar) SpeedTestInsert(ctx contractapi.TransactionContextInterface, sensorID string) error {
+	log.Println("============= START : InsertEncryptedData ===========")
+	dbName := os.Getenv("HOSTNAME")
+	db, err := s.connectToPostgres(dbName)
+	if err != nil {
+		return err
+	}
+	defer db.Close()
 
+	sensorAsBytes, err := ctx.GetStub().GetState(sensorID)
+	if err != nil {
+		return err
+	}
+	if sensorAsBytes == nil {
+		return fmt.Errorf("%s does not exist", sensorID)
+	}
 
-
-
-func (s *FabCar) SendFingerprint(ctx contractapi.TransactionContextInterface) error {
-	fingerprint := "ERROR"
-	cmd := fmt.Sprintf(`MYSQL_PWD=rootpassword0 mysqldump -h 172.17.0.1 -P 3306 -u root --no-create-info --skip-comments --compact --ignore-table=%s._keys %s | md5sum`, os.Getenv("HOSTNAME"), os.Getenv("HOSTNAME"))
-
-	output, err := exec.Command("sh", "-c", cmd).Output()
+	var sensor Sensor
+	err = json.Unmarshal(sensorAsBytes, &sensor)
 	if err != nil {
 		return err
 	}
 
-	fingerprint = strings.TrimSpace(strings.Split(string(output), " ")[0])
-
-	resp, err := http.Get(fmt.Sprintf("http://localhost:5000/?peerId=%s&fingerprint=\"%s\"", os.Getenv("HOSTNAME"), fingerprint))
+	rows, err := s.runQuery(db, fmt.Sprintf("SELECT _key FROM _keys WHERE sensorId = '%s'", sensor.SensorID))
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
+	defer rows.Close()
 
+	var myKey string
+	if rows.Next() {
+		err := rows.Scan(&myKey)
+		if err != nil {
+			return err
+		}
+	} else {
+		return fmt.Errorf("no results found for the given sensorId")
+	}
+
+	skXStr, skYStr := splitKey(myKey)
+	mkXStr, mkYStr := splitKey(sensor.SharedKey)
+
+	skX := new(big.Int)
+	skX.SetString(skXStr, 10)
+
+	skY := new(big.Int)
+	skY.SetString(skYStr, 10)
+
+	mkX := new(big.Int)
+	mkX.SetString(mkXStr, 10)
+
+	mkY := new(big.Int)
+	mkY.SetString(mkYStr, 10)
+
+	a := new(big.Int).Sub(skY, mkY)
+	a.Div(a, new(big.Int).Sub(skX, mkX))
+
+	b := new(big.Int).Sub(mkY, new(big.Int).Mul(a, mkX))
+
+	secret := new(big.Int).Mul(a, big.NewInt(658741143))
+	secret.Add(secret, b)
+
+	secretStr := secret.String()
+	if len(secretStr) < 32 {
+		secretStr = fmt.Sprintf("%032s", secretStr)
+	}
+	secretBuffer := sha256.Sum256([]byte(secretStr[len(secretStr)-32:]))
+
+	db, err = s.connectToPostgres("hybrid")
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+
+	startTime := time.Date(2023, 1, 1, 0, 0, 0, 0, time.UTC)
+	endTime := time.Date(2023, 1, 9, 0, 0, 0, 0, time.UTC)
+	totalData := int(endTime.Sub(startTime).Seconds())
+	data := make([]Data, totalData)
+
+	for i := 0; i < totalData; i++ {
+		data[i] = Data{
+			Date: startTime.Add(time.Duration(i) * time.Second).Format(time.RFC3339),
+			Data: fmt.Sprintf("%d",i),
+		}
+	}
+
+	batchSize := 50000
+	for i := 0; i < totalData; i += batchSize {
+		end := i + batchSize
+		if end > totalData {
+			end = totalData
+		}
+
+		query := fmt.Sprintf("INSERT INTO %s (time, data) VALUES ", sensorID)
+		var values []string
+
+		for _, d := range data[i:end] {
+			ciphertext, err := encrypt(secretBuffer[:], []byte(d.Data))
+			if err != nil {
+				fmt.Println(err)
+				return err
+			}
+			encryptedData := hex.EncodeToString(ciphertext)
+			value := fmt.Sprintf("('%s', '%s')", d.Date, encryptedData)
+			values = append(values, value)
+		}
+
+		query += strings.Join(values, ", ")
+
+		fmt.Println("Executing INSERT query ... ")
+		_, err = s.runQuery(db, query)
+		if err != nil {
+			fmt.Println(err)
+			return err
+		}
+
+		log.Printf("Inserted %d/%d data points\n", end, totalData)
+		s.sleep(1000)
+	}
+
+	log.Println("============= END : InsertEncryptedData ===========")
 	return nil
 }
 
-func (s *FabCar) EndorseCeremony(ctx contractapi.TransactionContextInterface, goodFingerprint string) error {
-	log.Println("============= START : endorseCeremony ===========")
 
-	fingerprintKey := fmt.Sprintf("fingerprint_%s", time.Now().Format(time.RFC3339))
 
-	fingerprintRecord := map[string]string{
-		"fingerprint": goodFingerprint,
-		"timestamp":   time.Now().Format(time.RFC3339),
-	}
-
-	fingerprintJSON, err := json.Marshal(fingerprintRecord)
+func (s *FabCar) SpeedTestQuery(ctx contractapi.TransactionContextInterface, sensorID string) (string, error) {
+	log.Println("============= START : speedTest ===========")
+	dbName := os.Getenv("HOSTNAME")
+	db, err := s.connectToPostgres(dbName)
 	if err != nil {
-		return err
+		return "",err
 	}
+	defer db.Close()
 
-	err = ctx.GetStub().PutState(fingerprintKey, fingerprintJSON)
+
+	sensorAsBytes, err := ctx.GetStub().GetState(sensorID)
 	if err != nil {
-		return err
+		return "", err
+	}
+	if sensorAsBytes == nil {
+		return "", fmt.Errorf("%s does not exist", sensorID)
 	}
 
-	log.Println("============= END : endorseCeremony ===========")
-	return nil
+	var sensor Sensor
+	err = json.Unmarshal(sensorAsBytes, &sensor)
+	if err != nil {
+		return "", err
+	}
+
+	rows, err := s.runQuery(db, fmt.Sprintf("SELECT _key FROM _keys WHERE sensorId = '%s'", sensor.SensorID))
+	if err != nil {
+		return "", err
+	}
+	defer rows.Close()
+
+	var myKey string
+	if rows.Next() {
+		err := rows.Scan(&myKey)
+		if err != nil {
+			return "", err
+		}
+	} else {
+		return "", fmt.Errorf("no results found for the given sensorId")
+	}
+
+	skXStr, skYStr := splitKey(myKey)
+	mkXStr, mkYStr := splitKey(sensor.SharedKey)
+
+	skX := new(big.Int)
+	skX.SetString(skXStr, 10)
+
+	skY := new(big.Int)
+	skY.SetString(skYStr, 10)
+
+	mkX := new(big.Int)
+	mkX.SetString(mkXStr, 10)
+
+	mkY := new(big.Int)
+	mkY.SetString(mkYStr, 10)
+
+	a := new(big.Int).Sub(skY, mkY)
+	a.Div(a, new(big.Int).Sub(skX, mkX))
+
+	b := new(big.Int).Sub(mkY, new(big.Int).Mul(a, mkX))
+
+	secret := new(big.Int).Mul(a, big.NewInt(658741143))
+	secret.Add(secret, b)
+
+	secretStr := secret.String()
+	if len(secretStr) < 32 {
+		secretStr = fmt.Sprintf("%032s", secretStr)
+	}
+	secretBuffer := sha256.Sum256([]byte(secretStr[len(secretStr)-32:]))
+
+
+	db, err = s.connectToPostgres("hybrid")
+	if err != nil {
+		return "",err
+	}
+	defer db.Close()
+
+
+	query := fmt.Sprintf(`
+		SELECT time_bucket('1 day', time) AS day, data 
+		FROM %s 
+		WHERE time >= '2023-01-01' AND time < '2023-01-02';`, sensorID)
+
+	rows, err = s.runQuery(db, query)
+	if err != nil {
+		return "",err
+	}
+	defer rows.Close()
+
+
+	var results []Data
+	for rows.Next() {
+		var d Data
+		err := rows.Scan(&d.Date, &d.Data)
+		if err != nil {
+			return "", err
+		}
+
+		plaintext, err := decrypt(secretBuffer[:], d.Data)
+		if err != nil {
+			return "", err
+		}
+		d.Data = string(plaintext)
+
+		results = append(results, d)
+	}
+
+	resultJSON, err := json.Marshal(results)
+	if err != nil {
+		return "", err
+	}
+	
+	log.Println("============= END : speedTest ===========")
+	return string(resultJSON), nil
 }
+
 
 func splitKey(key string) (string, string) {
 	parts := strings.Split(key, "|")

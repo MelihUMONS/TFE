@@ -1,3 +1,0 @@
-peer chaincode list --installed
-Get installed chaincodes on peer:
-

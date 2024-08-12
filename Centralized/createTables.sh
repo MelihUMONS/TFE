@@ -23,6 +23,8 @@ do
     time TIMESTAMPTZ NOT NULL,
     data DOUBLE PRECISION NOT NULL
   );"
+  
+  $PSQL "CREATE INDEX ON $TABLE_NAME (time);"
 done
 
 echo "Création de $TABLE_COUNT tables terminée."
